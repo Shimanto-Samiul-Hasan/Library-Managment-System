@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        {% if is_direct %}
+                            {% if is_purchase %}Payment for Purchase{% else %}Payment for Borrowing{% endif %}
+                        {% else %}
+                            Payment Method
+                        {% endif %}
+                    </h3>
+                    <form action="{{ url_for('process_direct_payment' if is_direct else 'process_payment') }}" method="post">
+                        {% if is_direct and not is_purchase %}
+                            <div class="alert alert-info">
+                                You are about to borrow this book for $2.00. It will be due in 14 days.
+                            </div>
+                            
+                            <!-- Days Selection -->
+                            <div class="mb-4">
+                                <label for="days" class="form-label">Borrow Duration (Days)</label>
+                                <select class="form-select" name="days" id="days" required>
+                                    <option value="7">7 Days</option>
+                                    <option value="14" selected>14 Days</option>
+                                    <option value="30">30 Days</option>
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <!-- Payment Methods -->
+                        <div class="mb-4">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="card" value="card" checked>
+                                <label class="form-check-label" for="card">
+                                    <i class="bi bi-credit-card me-2"></i>Credit/Debit Card
+                                </label>
+                                <div class="mt-2 ms-4" id="card-input">
+                                    <input type="text" name="card_number" class="form-control" placeholder="Card Number">
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="alipay" value="alipay">
+                                <label class="form-check-label" for="alipay">
+                                    <i class="bi bi-alipay me-2"></i>Alipay
+                                </label>
+                                <div class="mt-2 ms-4" id="alipay-input" style="display: none;">
+                                    <input type="text" name="alipay_phone" class="form-control" placeholder="Phone Number">
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="wepay" value="wepay">
+                                <label class="form-check-label" for="wepay">
+                                    <i class="bi bi-wechat me-2"></i>WeChat Pay
+                                </label>
+                                <div class="mt-2 ms-4" id="wepay-input" style="display: none;">
+                                    <input type="text" name="wepay_phone" class="form-control" placeholder="Phone Number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            {% if is_direct and not is_purchase %}
+                                Pay $2.00 and Borrow
+                            {% else %}
+                                Pay ${{ "%.2f"|format(total) }}
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        {% if is_direct %}
+                            {% if is_purchase %}Purchase Summary{% else %}Borrowing Summary{% endif %}
+                        {% else %}
+                            Order Summary
+                        {% endif %}
+                    </h5>
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <h6 class="mb-0">{{ item.title }}</h6>
+                            {% if not is_direct %}
+                            <small class="text-muted">Qty: {{ item.quantity }}</small>
+                            {% endif %}
+                        </div>
+                        {% if is_purchase or not is_direct %}
+                        <span>${{ "%.2f"|format(item.price * (item.quantity if not is_direct else 1)) }}</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if is_purchase or not is_direct %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="h5">Total</span>
+                        <span class="h5">${{ "%.2f"|format(total) }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const cardInput = document.getElementById('card-input');
+    const alipayInput = document.getElementById('alipay-input');
+    const wepayInput = document.getElementById('wepay-input');
+
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            // Hide all inputs
+            cardInput.style.display = 'none';
+            alipayInput.style.display = 'none';
+            wepayInput.style.display = 'none';
+
+            // Show selected input
+            if (this.value === 'card') {
+                cardInput.style.display = 'block';
+            } else if (this.value === 'alipay') {
+                alipayInput.style.display = 'block';
+            } else if (this.value === 'wepay') {
+                wepayInput.style.display = 'block';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

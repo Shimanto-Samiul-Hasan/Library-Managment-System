@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Books</h2>
+
+    <!-- Borrowed Books -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Borrowed Books</h3>
+        </div>
+        <div class="card-body">
+            {% if borrowed_books %}
+            <div class="row">
+                {% for book in borrowed_books %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ book.cover_image if book.cover_image else url_for('static', filename='images/default-book.jpg') }}" 
+                             class="card-img-top" alt="{{ book.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text">{{ book.authors }}</p>
+                            <div class="text-muted small">
+                                <p class="mb-1">Borrowed: {{ book.borrow_date.strftime('%Y-%m-%d') }}</p>
+                                <p class="mb-1">Due: {{ book.due_date.strftime('%Y-%m-%d') }}</p>
+                                {% if book.return_date %}
+                                <p class="mb-1">Returned: {{ book.return_date.strftime('%Y-%m-%d') }}</p>
+                                {% endif %}
+                                <p class="mb-1">Days: {{ book.days_borrowed }}</p>
+                                <p class="mb-0">
+                                    Status: 
+                                    {% if book.status == 'Overdue' %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                    {% elif book.status == 'Returned' %}
+                                    <span class="badge bg-success">Returned</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">Active</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>You haven't borrowed any books yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Purchased Books -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Purchased Books</h3>
+        </div>
+        <div class="card-body">
+            {% if purchased_books %}
+            <div class="row">
+                {% for book in purchased_books %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ book.cover_image if book.cover_image else url_for('static', filename='images/default-book.jpg') }}" 
+                             class="card-img-top" alt="{{ book.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text">{{ book.authors }}</p>
+                            <div class="text-muted small">
+                                <p class="mb-1">Purchased: {{ book.purchase_date.strftime('%Y-%m-%d') }}</p>
+                                <p class="mb-0">Price: ${{ "%.2f"|format(book.price) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>You haven't purchased any books yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Book Cover and Details -->
+        <div class="col-md-4">
+            <img src="{{ book.cover_image if book.cover_image else url_for('static', filename='images/default-book.jpg') }}" alt="{{ book.title }}" class="img-fluid rounded shadow">
+            
+            {% if session.get('loggedin') %}
+            <div class="card-footer bg-white border-top-0">
+                <div class="d-flex gap-2">
+                    <form action="{{ url_for('direct_checkout', book_id=book.id, action='borrow') }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-primary">
+                            Borrow Book
+                        </button>
+                    </form>
+                    <form action="{{ url_for('direct_checkout', book_id=book.id, action='buy') }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-success">
+                            Buy Book (${{ "%.2f"|format(book.price) }})
+                        </button>
+                    </form>
+                    <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info mt-4">
+                Please <a href="{{ url_for('login') }}">login</a> to borrow or buy this book.
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Book Information -->
+        <div class="col-md-8">
+            <h1 class="mb-4">{{ book.title }}</h1>
+            
+            <div class="mb-4">
+                <h5 class="text-muted">Authors</h5>
+                <p>{{ book.authors }}</p>
+                
+                {% if book.category_name %}
+                <h5 class="text-muted">Category</h5>
+                <p>{{ book.category_name }}</p>
+                {% endif %}
+                
+                <h5 class="text-muted">Description</h5>
+                <p>{{ book.description }}</p>
+            </div>
+            
+            {% if book.preview_link %}
+            <a href="{{ book.preview_link }}" target="_blank" class="btn btn-outline-primary">
+                <i class="fas fa-external-link-alt me-2"></i>Preview Book
+            </a>
+            {% endif %}
+            
+            <!-- Book Details -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Source:</th>
+                            <td>
+                                {% if book.source == 'admin' %}
+                                    <span class="badge bg-primary">Library Collection</span>
+                                {% elif book.source == 'openlibrary' %}
+                                    <span class="badge bg-success">Open Library</span>
+                                {% elif book.source == 'gutenberg' %}
+                                    <span class="badge bg-info">Project Gutenberg</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Added:</th>
+                            <td>{{ book.created_at.strftime('%B %d, %Y') if book.created_at else 'N/A' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Books -->
+    {% if related_books %}
+    <div class="mt-5">
+        <h3 class="mb-4">Related Books</h3>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for book in related_books %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ book.cover_image if book.cover_image else url_for('static', filename='images/default-book.jpg') }}" 
+                         class="card-img-top" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ book.title }}</h5>
+                        <p class="card-text text-muted text-truncate">{{ book.authors }}</p>
+                        <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-sm btn-outline-primary">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Borrow Modal -->
+<div class="modal fade" id="borrowModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Borrow Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('borrow', book_id=book.id) }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="days" class="form-label">Number of Days</label>
+                        <input type="number" class="form-control" id="days" name="days" min="1" max="30" required>
+                        <div class="form-text">Cost per day: $2.00</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Total Cost</label>
+                        <div class="h4" id="totalCost">$0.00</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Confirm Borrow</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Buy Modal -->
+<div class="modal fade" id="buyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Buy Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('buy', book_id=book.id) }}" method="post">
+                <div class="modal-body">
+                    <p>You are about to purchase "{{ book.title }}"</p>
+                    <div class="h4">Total: ${{ "%.2f"|format(book.price) }}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Purchase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('days').addEventListener('input', function() {
+    const days = this.value;
+    const costPerDay = 2.00;
+    const totalCost = days * costPerDay;
+    document.getElementById('totalCost').textContent = `$${totalCost.toFixed(2)}`;
+});
+</script>
+{% endblock %}

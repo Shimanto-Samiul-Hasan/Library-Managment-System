@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Search Books - E-Library{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">Search Google Books</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('search_books') }}">
+                        <div class="mb-3">
+                            <label for="query" class="form-label">Search Query</label>
+                            <input type="text" class="form-control" id="query" name="query" required
+                                placeholder="Enter book title, author, or ISBN">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

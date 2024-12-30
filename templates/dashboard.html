@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="jumbotron bg-dark text-white text-center py-5 mb-5">
+        <h1 class="display-4">Welcome to E-Library</h1>
+        <p class="lead">Discover millions of books, from classics to the latest releases</p>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Browse Categories</h2>
+            <a href="{{ url_for('books') }}" class="text-primary">View All</a>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for category in categories %}
+            <div class="col">
+                <a href="{{ url_for('books', category=category.id) }}" class="text-decoration-none">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            {% if category.name == 'Arts' %}
+                            <i class="bi bi-palette fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Painting • Music • Design • Photography</div>
+                            {% elif category.name == 'Business' %}
+                            <i class="bi bi-briefcase fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Finance • Marketing • Management • Economics</div>
+                            {% elif category.name == 'Fiction' %}
+                            <i class="bi bi-book fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Novels • Fantasy • Mystery • Sci-Fi</div>
+                            {% elif category.name == 'History' %}
+                            <i class="bi bi-clock-history fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">World • Ancient • Military • Biography</div>
+                            {% elif category.name == 'Non-Fiction' %}
+                            <i class="bi bi-journal-text fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Biography • Essays • Journalism • Documentary</div>
+                            {% elif category.name == 'Science' %}
+                            <i class="bi bi-graph-up fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Physics • Biology • Chemistry • Astronomy</div>
+                            {% elif category.name == 'Self-Help' %}
+                            <i class="bi bi-lightbulb fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Psychology • Motivation • Personal Growth • Wellness</div>
+                            {% elif category.name == 'Technology' %}
+                            <i class="bi bi-cpu fs-1 text-primary mb-2"></i>
+                            <div class="small text-muted mb-2">Programming • Engineering • AI • Robotics</div>
+                            {% else %}
+                            <i class="bi bi-book fs-1 text-primary mb-2"></i>
+                            {% endif %}
+                            <h5 class="card-title text-primary">{{ category.name }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Featured Books Section -->
+    <div class="mb-5">
+        <h2 class="mb-4">Featured Books</h2>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for book in featured_books %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if book.cover_image %}
+                    <img src="{{ book.cover_image }}" class="card-img-top" alt="{{ book.title }}" style="height: 300px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <i class="bi bi-book fs-1 text-secondary"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text text-muted">{{ book.authors }}</p>
+                        <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

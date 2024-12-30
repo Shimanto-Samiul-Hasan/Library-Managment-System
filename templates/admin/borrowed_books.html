@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Borrowed Books</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Borrowed Books</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-book-reader me-1"></i>
+            Borrowed Books List
+        </div>
+        <div class="card-body">
+            {% if borrowed_books %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="borrowedBooksTable">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>User</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in borrowed_books %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ book.cover_image if book.cover_image else url_for('static', filename='images/default-book.jpg') }}" 
+                                         alt="{{ book.book_title }}" class="me-2" style="width: 50px; height: 70px; object-fit: cover;">
+                                    <div>
+                                        <strong>{{ book.book_title }}</strong><br>
+                                        <small class="text-muted">{{ book.authors }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ book.username }}</strong><br>
+                                <small class="text-muted">{{ book.email }}</small>
+                            </td>
+                            <td>{{ book.borrow_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ book.due_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if book.return_date %}
+                                    {{ book.return_date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    Not returned
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if book.return_date %}
+                                    <span class="badge bg-success">Returned</span>
+                                {% elif now > book.due_date %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                {% else %}
+                                    <span class="badge bg-primary">Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not book.return_date %}
+                                <form action="{{ url_for('return_book', borrow_id=book.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success" 
+                                            onclick="return confirm('Are you sure you want to mark this book as returned?')">
+                                        Mark as Returned
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <a href="{{ url_for('view_book', book_id=book.book_id) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    View Book
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No books have been borrowed yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#borrowedBooksTable').DataTable({
+            order: [[2, 'desc']], // Sort by borrow date by default
+            pageLength: 25
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

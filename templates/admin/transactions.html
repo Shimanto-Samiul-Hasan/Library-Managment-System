@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Transaction History</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Book</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.order_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ transaction.username }}</td>
+                            <td>{{ transaction.book_title }}</td>
+                            <td>
+                                {% if transaction.order_type == 'purchase' %}
+                                <span class="badge bg-success">Purchase</span>
+                                {% else %}
+                                <span class="badge bg-primary">Borrow</span>
+                                {% endif %}
+                            </td>
+                            <td>${{ "%.2f"|format(transaction.total_amount) }}</td>
+                            <td>
+                                {% if transaction.payment_method == 'card' %}
+                                <i class="bi bi-credit-card me-1"></i>
+                                {% elif transaction.payment_method == 'alipay' %}
+                                <i class="bi bi-alipay me-1"></i>
+                                {% else %}
+                                <i class="bi bi-wechat me-1"></i>
+                                {% endif %}
+                                {{ transaction.payment_method|title }}
+                            </td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
