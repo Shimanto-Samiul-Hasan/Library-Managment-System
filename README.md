@@ -85,25 +85,25 @@ The project uses Flask-MySQLdb to establish a connection between the Flask appli
 ### 1. System Architecture
 
 <div style="text-align: center;">
-    <img src="system-architecture.png"  height="500" alt="Description of the image">
+    <img src="system-architecture.png"   alt="Description of the image">
     </div>
 
 ### 2. Database ER Diagram
 
 <div style="text-align: center;">
-    <img src="erdiagram.png"  height="500" alt="Description of the image">
+    <img src="erdiagram.png"  alt="Description of the image">
     </div>
 
 ### 3. User Flow Diagram
 
 <div style="text-align: center;">
-    <img src="User-Flow-Diagram.png"  height="500" alt="Description of the image">
+    <img src="User-Flow-Diagram.png"  alt="Description of the image">
     </div>
 
 ### 4. Security Architecture
 
 <div style="text-align: center;">
-    <img src="security-architecture.png"  height="500" alt="Description of the image">
+    <img src="security-architecture.png"  alt="Description of the image">
     </div>
 
 ## Technical Details
