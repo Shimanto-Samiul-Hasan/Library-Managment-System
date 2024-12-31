@@ -80,6 +80,32 @@ The system leverages modern web technologies and best practices:
 
 The project uses Flask-MySQLdb to establish a connection between the Flask application and MySQL database. The connection is configured using environment variables stored in the `.env` file, which keeps sensitive database credentials secure. In `app.py`, we initialize the MySQL connection using the Flask-MySQLdb extension, which creates a connection pool to efficiently manage database connections. Each database operation uses parameterized queries with `MySQLdb.cursors.DictCursor` to prevent SQL injection and return results as dictionaries. The application maintains a persistent connection throughout the session, automatically handling connection pooling and cleanup. Error handling is implemented to gracefully manage connection issues and ensure proper connection closure. For database schema management, we use `setup_db.py` which executes the SQL commands defined in `schema.sql` to create and initialize the database structure, including tables, relationships, and default data.
 
+## System Architecture & Diagrams
+
+### 1. System Architecture
+
+<div style="text-align: center;">
+    <img src="system-architecture.png"  height="500" alt="Description of the image">
+    </div>
+
+### 2. Database ER Diagram
+
+<div style="text-align: center;">
+    <img src="erdiagram.png"  height="500" alt="Description of the image">
+    </div>
+
+### 3. User Flow Diagram
+
+<div style="text-align: center;">
+    <img src="User-Flow-Diagram.png"  height="500" alt="Description of the image">
+    </div>
+
+### 4. Security Architecture
+
+<div style="text-align: center;">
+    <img src="security-architecture.png"  height="500" alt="Description of the image">
+    </div>
+
 ## Technical Details
 
 ### Backend (Python/Flask)
@@ -256,31 +282,6 @@ The project uses Flask-MySQLdb to establish a connection between the Flask appli
    - Integration tests for API endpoints
    - Database mock testing
 
-## System Architecture & Diagrams
-
-### 1. System Architecture
-
-<div style="text-align: center;">
-    <img src="system-architecture.png"  height="500" alt="Description of the image">
-    </div>
-
-### 2. Database ER Diagram
-
-<div style="text-align: center;">
-    <img src="erdiagram.png"  height="500" alt="Description of the image">
-    </div>
-
-### 3. User Flow Diagram
-
-<div style="text-align: center;">
-    <img src="User-Flow-Diagram.png"  height="500" alt="Description of the image">
-    </div>
-
-### 4. Security Architecture
-
-<div style="text-align: center;">
-    <img src="security-architecture.png"  height="500" alt="Description of the image">
-    </div>
 
 ## Installation
 
